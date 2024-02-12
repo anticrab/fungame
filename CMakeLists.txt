@@ -4,7 +4,7 @@ project(fungame)
 set(CMAKE_CXX_STANDARD 26)
 
 add_executable(fungame
-        draw.h
+        graphics.h
         console.h
         math.hw
         main.cpp

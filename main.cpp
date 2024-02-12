@@ -5,7 +5,7 @@
 #include <thread>
 
 #include "console.h"
-#include "draw.h"
+#include "graphics.h"
 
 void ErrorExit(LPCSTR);
 
