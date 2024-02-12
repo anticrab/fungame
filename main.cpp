@@ -11,11 +11,6 @@ void ErrorExit(LPCSTR);
 
 uint64_t current_timestamp();
 
-int maiqn() {
-  vector2 a{1,1};
-  std::cout << a.length();
-  return 0;
-}
 
 int main() {
 

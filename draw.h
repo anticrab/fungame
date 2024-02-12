@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "math.h"
+#include "my_math.h"
 
 class point;
 
@@ -12,12 +12,12 @@ class object;
 
 class point {
 public:
-  point(vector2 coords, char symbol=1) {
+  point(Vector2 coords, char symbol=1) {
     coords_ = coords;
     symbol = symbol;
   }
 
 private:
-  vector2 coords_;
+  Vector2 coords_;
   char symbol_;
 };
