@@ -5,10 +5,14 @@
 #pragma once
 
 #include <cmath>
-#include <string>
 
 class Vector2;
 class Rect;
+
+template <typename Type>
+size_t hammingDistance(const Type n1, const Type n2) {
+  return (n1 ^ n2).count();
+}
 
 class Vector2 {
 public:
@@ -54,7 +58,7 @@ public:
 
   [[nodiscard]] Vector2 normolize() const { return (*this) / this->mag(); }
 
-  float operator*(const Vector2 &b) const { return x * b.x() + y * b.y(); }
+  float operator*(const Vector2 &b) const { return x * b.x + y * b.y; }
 
   [[nodiscard]] float dist(const Vector2 &vec) const {
     return (*this - vec).mag();
@@ -74,41 +78,41 @@ private:
 
 class Rect {
 public:
+  Vector2 position{};
+  Vector2 size{};
   Rect() = default;
-  Rect(const Vector2 &pos, const Vector2 &size) {
-    position_ = pos;
-    size_ = size;
+  Rect(const Vector2 &pos, const Vector2 &s) {
+    position = pos;
+    size = s;
   }
 
-  [[nodiscard]] float width() const { return size_.x; }
+  [[nodiscard]] float width() const { return size.x; }
 
-  void width(float value) { size_.x = value; }
+  void width(float value) { size.x = value; }
 
-  [[nodiscard]] float height() const { return size_.y; }
+  [[nodiscard]] float height() const { return size.y; }
 
-  void height(const float value) { size_.y = value; }
+  void height(const float value) { size.y = value; }
 
-  [[nodiscard]] float left() const { return position_.x; }
+  [[nodiscard]] float left() const { return position.x; }
 
-  [[nodiscard]] float right() const { return position_.x + size_.x; }
+  [[nodiscard]] float right() const { return position.x + size.x; }
 
-  [[nodiscard]] float top() const { return position_.y; }
+  [[nodiscard]] float top() const { return position.y; }
 
-  [[nodiscard]] float bottom() const { return position_.y + size_.y; }
+  [[nodiscard]] float bottom() const { return position.y + size.y; }
 
-  [[nodiscard]] float x() const { return position_.x; }
+  [[nodiscard]] float x() const { return position.x; }
 
-  void x(const float value) { position_.x = value; }
+  void x(const float value) { position.x = value; }
 
-  [[nodiscard]] float y() const { return position_.y; }
+  [[nodiscard]] float y() const { return position.y; }
 
-  void y(const float value) { position_.y = value; }
+  void y(const float value) { position.y = value; }
 
   [[nodiscard]] Vector2 center() const {
-    return {position_.x + size_.x / 2, position_.y + size_.y / 2};
+    return {position.x + size.x / 2, position.y + size.y / 2};
   }
 
 private:
-  Vector2 position_{};
-  Vector2 size_{};
 };

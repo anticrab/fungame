@@ -4,8 +4,8 @@ project(fungame)
 set(CMAKE_CXX_STANDARD 26)
 
 add_executable(fungame
-        graphics.h
-        console.h
-        math.hw
-        main.cpp
+        source/my_math.h
+        source/geometry.h
+        source/console.h
+        source/main.cpp
 )

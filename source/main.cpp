@@ -1,3 +1,6 @@
+//
+// Created by lokot_zxe3r on 09.02.2024.
+//
 #include "windows.h"
 #include <chrono>
 #include <cinttypes>
@@ -5,12 +8,15 @@
 #include <thread>
 
 #include "console.h"
-#include "graphics.h"
+#include "geometry.h"
+#include "my_math.h"
 
 void ErrorExit(LPCSTR);
 
 uint64_t current_timestamp();
 
+
+Console console(30, 120);
 
 int main() {
 
@@ -27,9 +33,9 @@ int main() {
     return 1;
   }
 
-  const int activeDuration = 100 * 1000; // длительность работы программы в миллисекундах
-  const int delay_300 = 3000;
-  const int delay_200 = 2000;
+  constexpr int activeDuration = 100 * 1000; // длительность работы программы в миллисекундах
+  constexpr int delay_300 = 300;
+  constexpr int delay_200 = 200;
 
   uint64_t currentTime = current_timestamp();
   uint64_t endTime = currentTime + activeDuration;
@@ -51,15 +57,11 @@ int main() {
   int eventsCount = 0;
   int x = 10;
   int y = 10;
+  float x1 = 0;
 
-  console Console(30, 120);
-  Console.print();
+  console.print();
 
-  Console.set(10,10, 'q');
-
-  Console.print();
-
-  while (index < 1000000) {
+  while (true) {
     DWORD cNumRead = 0;
     BOOL peekSuccessful = PeekConsoleInput(
         hStdin,     // ссылка на поток ввода
@@ -108,10 +110,19 @@ int main() {
     //   y--;
     //   // printf("Each 200 ms. Player position is (%d, %d)\n", x, y);
     // }
-    Console.set(x,y, 'q');
-    Console.print();
+    x1 = (x1+1 > 120*4)? 0 : x1+1;
+    Cyrcle pnt1{Vector2{x1, 15 * 8}, 40, 7};
+    // Cyrcle pnt2{Vector2{70 * 4, 15 * 8}, 40, 7};
+    // Cyrcle pnt3{Vector2{95 * 4, 15 * 8}, 40, 7};
 
-    std::chrono::milliseconds timespan(100); // or whatever
+    pnt1.draw(console);
+    // pnt2.draw(console);
+    // pnt3.draw(console);
+
+
+    console.print();
+
+    std::chrono::milliseconds timespan(10);
     std::this_thread::sleep_for(timespan);
 
     ++index;
