@@ -20,8 +20,6 @@ public:
     name_ = name;
   }
 
-  virtual ~Drawable() = default;
-
   void draw();
 
   Rect rect() { return rect_; }
@@ -56,24 +54,37 @@ protected:
 /**
  * Класс для отрисовки точки
  */
-class Cyrcle : virtual Drawable {
+class Cyrcle : public Drawable {
 public:
-  float radius;
-
   explicit Cyrcle(const Vector2 &pos, const float rad = 1.0,
                  const char &brightness = ' ', const std::string &name = "")
       : Drawable(Rect{Vector2{pos.x - rad, pos.y - rad},
-                      Vector2{pos.x + rad, pos.y + rad}},
+                      Vector2{2 * rad, 2 * rad}},
                  brightness, name) {
-    radius = rad;
+    radius_ = rad;
   }
 
-  Vector2 center() { return rect_.center(); }
+  [[nodiscard]] Vector2 center() const { return rect_.center(); }
 
-  void draw(Console &console) {
-    console.arc(position().x, position().y, radius * scale(), brightness());
+  void center(const float x, const float y) {
+    rect_.x(x);
+    rect_.y(y);
   }
+
+  void draw(Console &console) const {
+    console.arc(center().x, center().y, radius_ * scale(), brightness());
+  }
+
+  void radius(const float r) {
+    radius_ = r;
+  }
+
+  [[nodiscard]] float radius() const {
+    return radius_;
+  }
+
+
 
 private:
-
+  float radius_;
 };

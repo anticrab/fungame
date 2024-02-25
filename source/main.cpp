@@ -15,7 +15,6 @@ void ErrorExit(LPCSTR);
 
 uint64_t current_timestamp();
 
-
 Console console(30, 120);
 
 int main() {
@@ -33,7 +32,8 @@ int main() {
     return 1;
   }
 
-  constexpr int activeDuration = 100 * 1000; // длительность работы программы в миллисекундах
+  constexpr int activeDuration =
+      100 * 1000; // длительность работы программы в миллисекундах
   constexpr int delay_300 = 300;
   constexpr int delay_200 = 200;
 
@@ -52,14 +52,16 @@ int main() {
     ErrorExit("GetStdHandle");
   }
 
-
   int index = 0;
   int eventsCount = 0;
   int x = 10;
   int y = 10;
   float x1 = 0;
+  float y1 = 80;
 
   console.print();
+
+  Cyrcle pnt4{Vector2{x1, y1}, 60, 7};
 
   while (true) {
     DWORD cNumRead = 0;
@@ -77,7 +79,8 @@ int main() {
     }
 
     eventsCount += cNumRead;
-    // printf("iteration %d total %d current %d\n", index, eventsCount, cNumRead);
+    // printf("iteration %d total %d current %d\n", index, eventsCount,
+    // cNumRead);
 
     for (DWORD i = 0; i < cNumRead; i++) {
       if (irInBuf[i].EventType == KEY_EVENT) {
@@ -110,19 +113,21 @@ int main() {
     //   y--;
     //   // printf("Each 200 ms. Player position is (%d, %d)\n", x, y);
     // }
-    x1 = (x1+1 > 120*4)? 0 : x1+1;
-    Cyrcle pnt1{Vector2{x1, 15 * 8}, 40, 7};
-    // Cyrcle pnt2{Vector2{70 * 4, 15 * 8}, 40, 7};
+    x1 = (x1 + 1 > 120 * 4) ? 0 : x1 + 1;
+    // y1 = (y1 + 1 > 30 * 8) ? 0 : y1 + 1;
+    // Cyrcle pnt1{Vector2{x1, 100}, 40, 6};
+    // Cyrcle pnt2{Vector2{0, 0}, 50, 7};
     // Cyrcle pnt3{Vector2{95 * 4, 15 * 8}, 40, 7};
-
-    pnt1.draw(console);
+    pnt4.center(x1, y1);
+    // pnt1.draw(console);
+    // auto rr = pnt2.center();
     // pnt2.draw(console);
     // pnt3.draw(console);
-
+    pnt4.draw(console);
 
     console.print();
 
-    std::chrono::milliseconds timespan(10);
+    std::chrono::milliseconds timespan(100);
     std::this_thread::sleep_for(timespan);
 
     ++index;
