@@ -13,12 +13,22 @@
 
 void func();
 
+namespace Rules2Draw {
+bool arcRule(const float x, const float y, const float r, const float x1,
+             const float y1) {
+  return (x - x1) * (x - x1) + (y - y1) * (y - y1) <= r * r;
+}
+bool rectRule(const float x, const float y, const float height,
+              const float weight,const float x1, const float y1) {
+  return (x1 >= x) && (x1 < x + weight) && (y1 >= y) && (y1 < y + height);
+}
+}; // namespace Rules2Draw
+
 class Screen {
 public:
   int y_max;
   int x_max;
   int scale = 1;
-  std::vector<std::vector<uint8_t>> data_;
   Screen() = delete;
   Screen(const int n, const int m) : data_(n, std::vector<uint8_t>(m, 0)) {
     this->y_max = n;
@@ -26,33 +36,56 @@ public:
   }
 
   void set(const int x, const int y, const uint8_t brightness) {
-    data_[x][y] = brightness;
+    data_[y][x] = brightness;
   }
 
   [[nodiscard]] uint8_t get(const int i, const int j) const {
     return data_[i][j];
   }
 
-  void arc(const float x, const float y, const float radius,
-           const uint8_t brightness) {
+  template <typename... Types>
+  void withRule(const float x, const float y, const float radius,
+                const uint8_t brightness, bool (*rule)(Types...)) {
     float l = std::round(x - radius);
     l = (l - 1 >= 0) ? l - 1 : 0;
     float r = std::round(x + radius);
-    r = (r + 1 <= x_max) ? r + 1 : x_max;
+    r = (r + 1 < x_max) ? r + 1 : x_max - 1;
     float top = std::round(y + radius);
-    top = (top + 1 <= y_max) ? top + 1 : y_max;
+    top = (top + 1 < y_max) ? top + 1 : y_max - 1;
     float bot = std::round(y - radius);
     bot = (bot - 1 >= 0) ? bot - 1 : 0;
     for (float i = l; i <= r; ++i) {
       for (float j = bot; j <= top; ++j) {
-        if ((x - i) * (x - i) + (y - j) * (y - j) <= radius * radius) {
-          set(j, i, brightness);
+        if (rule(x, y, radius, i, j)) {
+          set(i, j, brightness);
+        }
+      }
+    }
+  }
+
+  template <typename... Types>
+  void withRule(const float x, const float y, const float weight,
+                const float height, const uint8_t brightness,
+                bool (*rule)(Types...)) {
+    float l = std::round(x);
+    l = (l - 1 >= 0) ? l : 0;
+    float r = std::round(x + weight);
+    r = (r + 1 < x_max) ? r : x_max - 1;
+    float bot = std::round(y + height);
+    bot = (bot + 1 < y_max) ? bot : y_max - 1;
+    float top = std::round(y);
+    top = (top - 1 >= 0) ? top : 0;
+    for (float i = l; i < r; ++i) {
+      for (float j = top; j < bot; ++j) {
+        if (rule(x, y, weight, height, i, j)) {
+          set(i, j, brightness);
         }
       }
     }
   }
 
 private:
+  std::vector<std::vector<uint8_t>> data_;
 };
 
 class Console {
@@ -115,7 +148,7 @@ public:
 
   Console() = delete;
   Console(const int n, const int m)
-      : data_(n, std::string(m, ' ')), screen_(n * symbol_n, m * symbol_m) {
+      : data_(n, std::string(m, ' ')), pixelsData_(n * symbol_n, m * symbol_m) {
     this->y_max = n;
     this->x_max = m;
   }
@@ -138,20 +171,18 @@ public:
                ++symbol_x_coords) {
             for (int symbol_y_coords = 0; symbol_y_coords < symbol_n;
                  ++symbol_y_coords) {
-              if (int q = abs(screen_.get(symbol_y_coords + y_coords,
-                                          symbol_x_coords + x_coords) -
+              if (int q = abs(pixelsData_.get(symbol_y_coords + y_coords,
+                                              symbol_x_coords + x_coords) -
                               matr[symbol_y_coords][symbol_x_coords]);
                   q == 0) {
                 ++count_0;
               } else {
-                if (q != 7) {
-                  int a = 3;
-                };
                 sum += q;
               }
             }
           }
-          if ((res_distanse > sum && count_0 == res_count_0) or (count_0 > res_count_0)) {
+          if ((res_distanse > sum && count_0 == res_count_0) or
+              (count_0 > res_count_0)) {
             res_distanse = sum;
             symbol2print = symbol;
             res_count_0 = count_0;
@@ -174,11 +205,19 @@ public:
 
   void arc(const float x, const float y, const float radius,
            const uint8_t brightness) {
-    screen_.arc(x, y, radius, brightness);
+    pixelsData_.withRule(x, y, radius, brightness, Rules2Draw::arcRule);
+  }
+
+  void rect(const float x, const float y, const float weight,
+            const float height, const uint8_t brightness) {
+    pixelsData_.withRule(x, y, weight, height, brightness,
+                         Rules2Draw::rectRule);
   }
 
 private:
-  void clear_screen_() { screen_ = Screen{y_max * symbol_n, x_max * symbol_m}; }
+  void clear_screen_() {
+    pixelsData_ = Screen(y_max * symbol_n, x_max * symbol_m);
+  }
   std::vector<std::string> data_;
-  Screen screen_;
+  Screen pixelsData_;
 };

@@ -88,7 +88,7 @@ public:
 
   [[nodiscard]] float width() const { return size.x; }
 
-  void width(float value) { size.x = value; }
+  void width(const float value) { size.x = value; }
 
   [[nodiscard]] float height() const { return size.y; }
 
@@ -112,6 +112,15 @@ public:
 
   [[nodiscard]] Vector2 center() const {
     return {position.x + size.x / 2, position.y + size.y / 2};
+  }
+
+  [[nodiscard]] Vector2 pos() const {
+    return position;
+  }
+
+  void pos(const float x, const  float y) {
+    position.x = x;
+    position.y = y;
   }
 
 private:
