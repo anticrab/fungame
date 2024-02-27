@@ -9,10 +9,17 @@
 class Vector2;
 class Rect;
 
-template <typename Type>
-size_t hammingDistance(const Type n1, const Type n2) {
-  return (n1 ^ n2).count();
+namespace Rules2Draw {
+inline bool arcRule(const float x, const float y, const float r, const float x1,
+                    const float y1) {
+  return (x - x1) * (x - x1) + (y - y1) * (y - y1) <= r * r;
 }
+inline bool rectRule(const float x, const float y, const float height,
+              const float weight,const float x1, const float y1) {
+  return (x1 >= x) && (x1 < x + weight) && (y1 >= y) && (y1 < y + height);
+}
+}; // namespace Rules2Draw
+
 
 class Vector2 {
 public:
@@ -68,7 +75,7 @@ public:
     return std::acos(((*this * vec) / (this->mag() * vec.mag())));
   }
 
-  Vector2 rotate(float angle) {
+  [[nodiscard]] Vector2 rotate(const float angle) const {
     return {x * std::cos(angle) - y * std::sin(angle),
             x * std::sin(angle) + y * std::cos(angle)};
   }

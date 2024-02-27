@@ -13,17 +13,6 @@
 
 void func();
 
-namespace Rules2Draw {
-bool arcRule(const float x, const float y, const float r, const float x1,
-             const float y1) {
-  return (x - x1) * (x - x1) + (y - y1) * (y - y1) <= r * r;
-}
-bool rectRule(const float x, const float y, const float height,
-              const float weight,const float x1, const float y1) {
-  return (x1 >= x) && (x1 < x + weight) && (y1 >= y) && (y1 < y + height);
-}
-}; // namespace Rules2Draw
-
 class Screen {
 public:
   int y_max;
