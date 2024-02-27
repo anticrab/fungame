@@ -101,21 +101,11 @@ public:
   void pos(const float x, const float y) { rect_.pos(x, y); }
 
 
-  void center(const float x, const float y) {
-    rect_.x(x - radius_);
-    rect_.y(y - radius_);
-  }
-
   void draw(Console &console) const override {
     console.rect(pos().x, pos().y, rect_.width(), rect_.height(), brightness());
   }
 
-  void radius(const float r) { radius_ = r; }
-
-  [[nodiscard]] float radius() const { return radius_; }
-
 private:
-  float radius_;
 };
 
 class SymbolRect : Drawable {
