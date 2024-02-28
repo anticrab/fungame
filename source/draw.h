@@ -9,7 +9,7 @@
 
 class Drawable {
 public:
-  explicit Drawable(const Rect &size = {}, const char &brightness = ' ',
+  explicit Drawable(const Rect &size = {}, const int &brightness = 7,
                     const std::string &name = "") {
     rect_ = size;
     brightness_ = brightness;
@@ -21,11 +21,26 @@ public:
 
   virtual void draw(Console &console) const {}
 
+  [[nodiscard]] virtual Vector2 center() const { return rect_.center(); }
+
+  virtual void center(const float x, const float y) {
+    rect_.x(x - rect_.size.x / 2);
+    rect_.y(y - rect_.size.y / 2);
+  }
+  virtual void radius(float r) {}
+
+  [[nodiscard]] virtual float radius() const { return 0; }
+
   Rect rect() { return rect_; }
 
-  [[nodiscard]] char brightness() const { return brightness_; }
+  virtual void move(const float x, const float y) {
+    rect_.x(rect_.x() + x);
+    rect_.y(rect_.y() + y);
+  }
 
-  void brightness(const char &color) { brightness_ = color; }
+  void brightness(const int &color) { brightness_ = color; }
+
+  [[nodiscard]] int brightness() const { return brightness_; }
 
   [[nodiscard]] Vector2 position() const { return rect_.position; }
 
@@ -37,7 +52,7 @@ public:
 
   [[nodiscard]] float scale() const { return scale_; }
 
-  void scale(float value) { scale_ = value; }
+  void scale(const float value) { scale_ = value; }
 
   [[nodiscard]] std::string name() const { return name_; }
 
@@ -45,8 +60,7 @@ public:
 
 protected:
   void rect(const Rect &value) { rect_ = value; }
-
-  char brightness_{};
+  int brightness_ = 7;
   Rect rect_;
   float scale_{};
   std::string name_;
@@ -58,16 +72,16 @@ protected:
 class Cyrcle : public Drawable {
 public:
   explicit Cyrcle(const float &posX, const float &posY, const float rad = 1.0,
-                  const char &brightness = ' ', const std::string &name = "")
+                  const int &brightness = 7, const std::string &name = "")
       : Drawable(
             Rect{Vector2{posX - rad, posY - rad}, Vector2{2 * rad, 2 * rad}},
             brightness, name) {
     radius_ = rad;
   }
 
-  [[nodiscard]] Vector2 center() const { return rect_.center(); }
+  [[nodiscard]] Vector2 center() const override { return rect_.center(); }
 
-  void center(const float x, const float y) {
+  void center(const float x, const float y) override {
     rect_.x(x - radius_);
     rect_.y(y - radius_);
   }
@@ -76,9 +90,9 @@ public:
     console.arc(center().x, center().y, radius_ * scale(), brightness());
   }
 
-  void radius(const float r) { radius_ = r; }
+  void radius(const float r) override { radius_ = r; }
 
-  [[nodiscard]] float radius() const { return radius_; }
+  [[nodiscard]] float radius() const override { return radius_; }
 
 private:
   float radius_;
@@ -89,17 +103,15 @@ private:
  */
 class DrawRect : public Drawable {
 public:
-  explicit DrawRect(const float &posX, const float &posY, const float weight = 1.0, const float height = 1.0,
+  explicit DrawRect(const float &posX, const float &posY,
+                    const float weight = 1.0, const float height = 1.0,
                     const char &brightness = ' ', const std::string &name = "")
-      : Drawable(
-            Rect{Vector2{posX, posY }, Vector2{weight, height}},
-            brightness, name) {
-  }
+      : Drawable(Rect{Vector2{posX, posY}, Vector2{weight, height}}, brightness,
+                 name) {}
 
   [[nodiscard]] Vector2 pos() const { return rect_.pos(); }
 
   void pos(const float x, const float y) { rect_.pos(x, y); }
-
 
   void draw(Console &console) const override {
     console.rect(pos().x, pos().y, rect_.width(), rect_.height(), brightness());
@@ -220,6 +232,8 @@ public:
     }
   }
 
-private:
+protected:
   std::vector<Drawable *> drawables_;
+
+private:
 };
