@@ -8,7 +8,8 @@
 class Snake : private DrawArray {
 public:
   Snake() = delete;
-  Snake(const float x, const float y, const float s, const int b = 7) : DrawArray() {
+  Snake(const float x, const float y, const float s, const int b = 7)
+      : DrawArray() {
     add(new Cyrcle{x, y, s, b});
     size_ = 1;
   }
@@ -19,7 +20,9 @@ public:
     }
   }
   void mag() {
-    add(new Cyrcle{drawables_[size_-1]->center().x,drawables_[size_-1]->center().y, drawables_[size_-1]->radius(), drawables_[size_-1]->brightness()});
+    add(new Cyrcle{
+        drawables_[size_ - 1]->center().x, drawables_[size_ - 1]->center().y,
+        drawables_[size_ - 1]->radius(), drawables_[size_ - 1]->brightness()});
     ++size_;
   }
 
@@ -33,7 +36,8 @@ public:
     buffer_.insert(buffer_.begin(), {x, y});
     drawables_[0]->move(x, y);
     for (int i = 1; i < size_; ++i) {
-      if ((drawables_[i]->center() - drawables_[i-1]->center()).mag() > drawables_[i]->radius()*0.9 + drawables_[i-1]->radius()) {
+      if ((drawables_[i]->center() - drawables_[i - 1]->center()).mag() >
+          drawables_[i]->radius() * 0.9 + drawables_[i - 1]->radius()) {
         drawables_[i]->move(buffer_[i].x, buffer_[i].y);
       }
     }
@@ -48,7 +52,11 @@ public:
     }
   }
 
+  [[nodiscard]] bool is_alive_border() const {
+    return drawables_[0]->rect().left() >= 0 &&drawables_[0]->rect().bottom() <= 30 * 8 &&drawables_[0]->rect().right() <= 120 * 4 &&drawables_[0]->rect().top() >= 0;
+  }
+
 private:
   size_t size_;
-  std::vector<Vector2> buffer_{{0,0}};
+  std::vector<Vector2> buffer_{{0, 0}};
 };
