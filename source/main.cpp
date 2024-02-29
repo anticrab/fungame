@@ -37,11 +37,12 @@ int main() {
   constexpr int activeDuration =
       100 * 1000; // длительность работы программы в миллисекундах
   constexpr int delay1 = 100;
-  constexpr int delay2 = 200;
+  constexpr int delay2 = 1000;
 
   uint64_t currentTime = current_timestamp();
   uint64_t startTime = currentTime;
   uint64_t updateTime1 = currentTime + delay1;
+  uint64_t updateTime2 = currentTime + delay2;
   uint64_t endTime = currentTime + activeDuration;
 
   HANDLE hStdin;
@@ -68,19 +69,26 @@ int main() {
   // cyrcles.add(pnt5);
 
   std::chrono::milliseconds timespan(1);
-  bool q;
+
   while (true) {
 
     currentTime = current_timestamp();
     startTime = currentTime;
     updateTime1 = currentTime + delay1;
+    updateTime2 = currentTime + delay2;
     endTime = currentTime + activeDuration;
 
+
     auto snake = new Snake(30, 30, 10, 5);
-    snake->mag(10);
+    // snake->mag(20);
+
+    auto apple = new Apple(100, 100, 15, 7);
+    apple->rand_coords();
+
+
     Vector2 moveVector{10, 0};
     console.print();
-    while (snake->is_alive_border()) {
+    while (snake->is_alive_border() && snake->is_alive_body()) {
       startTime = current_timestamp();
       DWORD cNumRead = 0;
       BOOL peekSuccessful = PeekConsoleInput(
@@ -95,9 +103,6 @@ int main() {
       if (!FlushConsoleInputBuffer(hStdin)) {
         ErrorExit("FlushConsoleInputBuffer");
       }
-
-      // printf("iteration %d total %d current %d\n", index, eventsCount,
-      // cNumRead);
 
       // for (DWORD i = 0; i < cNumRead; i++) {
       //   if (irInBuf[i].EventType == KEY_EVENT) {
@@ -125,25 +130,25 @@ int main() {
         moveVector = moveVector.rotate(+M_PI / 200);
       }
 
-      currentTime = current_timestamp();
-      // if (updateTime_200 <= currentTime) {
-      //   updateTime_200 += delay_200;
-      //   y--;
-      //   // printf("Each 200 ms. Player position is (%d, %d)\n", x, y);
-      // }
-      if (updateTime1 <= currentTime) { //
-        // x1 = (x1 + 0.1 > 120 * 2) ? 0 : x1 + 0.1;
-        // s = (s + 0.01 > M_PI * 2) ? 0 : s + 0.01;
+      if (snake->is_eat_apple(apple)) {
+        snake->mag();
+        apple->rand_coords();
+      }
 
+      currentTime = current_timestamp();
+      if (updateTime1 <= currentTime) {
         snake->move(moveVector.x, moveVector.y);
 
         updateTime1 += delay1;
       }
-      // y1 = (y1 + 1 > 30 * 8) ? 0 : y1 + 1;
-      // pnt4->center( x, y);
+
+      if(updateTime2 <= currentTime) {
+        // snake->mag();
+        updateTime2 += delay2;
+      }
 
       snake->draw(console);
-      // pnt4->draw(console);
+      apple->draw(console);
 
       console.render_display();
       console.print();

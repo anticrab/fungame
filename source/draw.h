@@ -58,6 +58,10 @@ public:
 
   void name(const std::string &value) { name_ = value; }
 
+  virtual bool is_intersect(Drawable& other) const {
+    return false;
+  }
+
 protected:
   void rect(const Rect &value) { rect_ = value; }
   int brightness_ = 7;
@@ -93,6 +97,10 @@ public:
   void radius(const float r) override { radius_ = r; }
 
   [[nodiscard]] float radius() const override { return radius_; }
+
+  bool is_intersect(Drawable& other) const override {
+    return (this->center() - other.center()).mag() < this->radius() + other.radius();
+  }
 
 private:
   float radius_;
