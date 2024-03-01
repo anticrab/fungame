@@ -82,12 +82,20 @@ int main() {
     auto snake = new Snake(30, 30, 10, 5);
     // snake->mag(20);
 
-    auto apple = new Apple(100, 100, 15, 7);
+    auto apple = new Apple(100, 100, 12, 7);
     apple->rand_coords();
+
+    console.clear_symbols();
+    console.set_symbol(0, 1, "SCORE: ");
+    int score = 0;
+    console.set_symbol(7, 1, '0');
 
 
     Vector2 moveVector{10, 0};
+
+    console.render_display();
     console.print();
+
     while (snake->is_alive_border() && snake->is_alive_body()) {
       startTime = current_timestamp();
       DWORD cNumRead = 0;
@@ -133,6 +141,8 @@ int main() {
       if (snake->is_eat_apple(apple)) {
         snake->mag();
         apple->rand_coords();
+        ++score;
+        console.set_symbol(7, 1, std::to_string(score));
       }
 
       currentTime = current_timestamp();

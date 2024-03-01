@@ -28,8 +28,8 @@ public:
     data_[y][x] = brightness;
   }
 
-  [[nodiscard]] uint8_t get(const int i, const int j) const {
-    return data_[i][j];
+  [[nodiscard]] uint8_t get(const int x, const int y) const {
+    return data_[y][x];
   }
 
   template <typename... Types>
@@ -86,19 +86,25 @@ public:
 
   Console() = delete;
   Console(const int n, const int m)
-      : data_(n, std::string(m, ' ')), pixelsData_(n * symbol_n, m * symbol_m) {
+      : data_(n, std::string(m, ' ')), symbolsData_(n, std::vector<char>(m, 0)),
+        pixelsData_(n * symbol_n, m * symbol_m) {
     this->y_max = n;
     this->x_max = m;
   }
 
   void set(const int x, const int y, const char symbol) {
-    data_[x][y] = symbol;
+    data_[y][x] = symbol;
   }
 
   void render_display() {
     for (int x_coords = 0; x_coords < x_max * symbol_m; x_coords += symbol_m) {
       for (int y_coords = 0; y_coords < y_max * symbol_n;
            y_coords += symbol_n) {
+        if (symbolsData_[(y_coords / symbol_n)][(x_coords / symbol_m)] != 0) {
+          set((x_coords / symbol_m), (y_coords / symbol_n),
+              symbolsData_[(y_coords / symbol_n)][(x_coords / symbol_m)]);
+          continue;
+        }
         int res_distanse = INT_MAX;
         char symbol2print = ' ';
         for (auto &[symbol, matr] : symbols) {
@@ -107,8 +113,8 @@ public:
                ++symbol_x_coords) {
             for (int symbol_y_coords = 0; symbol_y_coords < symbol_n;
                  ++symbol_y_coords) {
-              if (int q = abs(pixelsData_.get(symbol_y_coords + y_coords,
-                                              symbol_x_coords + x_coords) -
+              if (int q = abs(pixelsData_.get(symbol_x_coords + x_coords,
+                                              symbol_y_coords + y_coords) -
                               matr[symbol_y_coords][symbol_x_coords])) {
                 sum += q;
               }
@@ -119,7 +125,7 @@ public:
             symbol2print = symbol;
           }
         }
-        set((y_coords / symbol_n), (x_coords / symbol_m), symbol2print);
+        set((x_coords / symbol_m), (y_coords / symbol_n), symbol2print);
       }
     }
     clear_screen_();
@@ -144,12 +150,31 @@ public:
                          Rules2Draw::rectRule);
   }
 
+  void clear_symbols() {
+    for (int i = 0; i < y_max; ++i) {
+      for (int j = 0; j < x_max; ++j) {
+        symbolsData_[i][j] = 0;
+      }
+    }
+  }
+
+  void set_symbol(const int x, const int y, const char symbol) {
+    symbolsData_[y][x] = symbol;
+  }
+
+  void set_symbol(const int x, const int y, const std::string &str) {
+    for (int i = 0; i + x < x_max and i < str.size(); ++i) {
+      set_symbol(x + i, y, str[i]);
+    }
+  }
+
 private:
   void clear_screen_() {
     pixelsData_ = Screen(y_max * symbol_n, x_max * symbol_m);
   }
   std::vector<std::string> data_;
   Screen pixelsData_;
+  std::vector<std::vector<char>> symbolsData_;
 
 public:
   std::unordered_map<char, std::array<std::array<uint8_t, 4>, 8>> symbols{
