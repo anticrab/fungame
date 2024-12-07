@@ -22,9 +22,8 @@ ENV WINDRES=x86_64-w64-mingw32-windres
 WORKDIR /app
 
 # Копируем только скрипты и необходимые файлы для настройки
-COPY toolchain-mingw.cmake /app/toolchain-mingw.cmake
+COPY ./ /app
 
-COPY build.sh /app/docker_build.sh
 RUN chmod +x /app/docker_build.sh
 CMD ["/app/docker_build.sh"]
 
